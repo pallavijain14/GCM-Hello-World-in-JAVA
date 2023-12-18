@@ -1,0 +1,68 @@
+package com.main.decrpytion;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Base64;
+import javax.crypto.Cipher;
+
+public class RSA {
+
+	private PublicKey publicKey;
+	private PrivateKey privateKey;
+
+	public RSA() {
+		try {
+
+			KeyPairGenerator keyPairGenarator =  KeyPairGenerator.getInstance("RSA");
+			keyPairGenarator.initialize(1024);
+			KeyPair keypair = keyPairGenarator.generateKeyPair();
+			privateKey = keypair.getPrivate();
+			publicKey = keypair.getPublic();
+
+		}catch(Exception ignored) {
+
+		}
+	}
+
+	public String encrypt(String message) throws  Exception{
+		byte[] messageToBytes = message.getBytes();
+		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
+		cipher.init(Cipher.ENCRYPT_MODE, publicKey);		
+		byte[] encrpytedBytes = cipher.doFinal(messageToBytes);
+		return encode(encrpytedBytes);
+	}
+
+	public String encode(byte[] data) {
+		return Base64.getEncoder().encodeToString(data);
+	}
+
+	public String decrypt(String EncryptedMessage) throws  Exception{
+		byte[] encryptedBytes = decode(EncryptedMessage);
+		Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
+		cipher.init(Cipher.DECRYPT_MODE, privateKey);
+		byte[] decryptedMeassage = cipher.doFinal(encryptedBytes);
+		return new String(decryptedMeassage,"UTF16");
+	}
+
+	public byte[] decode(String data) {
+		return Base64.getDecoder().decode(data);
+	}
+ 
+	public static void main(String[] args) {
+		RSA rsa = new RSA();
+		try {
+			
+			String encryptedString = rsa.encrypt("Hello");
+			String decryptedString = rsa.decrypt("HMYtn19EcnaNaEddlf1Jiw==");
+			System.out.println("Enc - "+encryptedString );
+			System.out.println("Dcr - "+decryptedString);
+			
+
+		}catch(Exception ignored) {
+
+		}
+	}
+
+}
