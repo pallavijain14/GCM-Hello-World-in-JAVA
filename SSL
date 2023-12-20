@@ -1,0 +1,54 @@
+package com.main.decrpytion;
+
+import java.security.KeyStore;
+import java.security.Security;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.Base64;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+
+public class SSL {
+
+	public String getDigitalSignature(byte[] dataBytes, String activeProfile, String certificatePath, String certificateAliasKey, String keystoreInstance, String privateKeyPath, String p12Password, String keyPassword ) {
+		String signature = "";
+		try {
+			Security.addProvider(new BouncyCastleProvider());
+
+			CertificateFactory certFactory = CertificateFactory.getInstance("X.509", "BC");
+			
+			X509Certificate certificate = (X509Certificate) certFactory.generateCertificate(this.getClass().getResourceAsStream("/" + activeProfile + "/" +certificatePath));
+
+//			X509Certificate certificate = (X509Certificate) certFactory.generateCertificate(this.getClass().getResourceAsStream("/nsdl/" +certificatePath));
+
+			System.out.println("/" + activeProfile + "/" +certificatePath);
+			
+			System.out.println("================== Certificate ========== ");
+			System.out.println(certificate);
+			
+			KeyStore keystore = KeyStore.getInstance(keystoreInstance);
+						
+			String keyLocation = "/" + activeProfile + "/" + privateKeyPath;
+//			String keyLocation = "/nsdl/" + privateKeyPath;
+			keystore.load(this.getClass().getResourceAsStream(keyLocation), p12Password.toCharArray());
+			
+			//PrivateKey privateKey = (PrivateKey) keystore.getKey(certificateAliasKey, keyPassword.toCharArray());
+			String sslKey = "MIIEpAIBAAKCAQEA2CgiUym+V4xjNial0x7DAFbyMRzTTFSFsKCosBk2mPtY7ojs3UNa/ds4FwT6OhfqYG1HxC+zWSMAqQSyLAxTfGJ6C9278Z74hWobicGUIC/8AA15JJSRZKqLIrpGoTvzHykSG8dAYiEghFX/sBOcN7eMkx48pU1Wzg1pelIVxhohqkXu/odhPGMWkPptYuDAi5NoRCukmSHa0CpPq4CrBBsmfaYDvy8eSuj64i1PQXurSZZmp/AiMw5Q0OErqCQH1m0EBkXtVHSZaxR4odtuMGIgGIQ0BessCy6W10nso8OuRc+NlsMbAil/5JhmTiaAlwEZ6tj5HjXeiVPeVeei1QIDAQABAoIBAHrumFbjrrTryqDJahWfsRdIW4VC94i5qS7CsC02qa5nhDRk+xD7dYxaWJP+6LCRWWJtxBr3ZfCTz5RQb2RNvk1HVFHbUUAhQQXfSroVtcB4icEd6H+9XtL5ixe9CN450hMusHXL4/nrDSs2Haxt+rJVWUVyNNtuGKgnSI2gkXGP7unFMK5mJdFc2zS7eZcn7KuFIqqTNBXdtTbln862jabtSuuZi8sStiaBTd7xMHUjl1BwWAFYVWyIrVqnsb6NQ7TeS6HmZymiQjne2KZs9VYX8Edn9+Y4yDojsTXM27ihUrVfkYInIENsDgTHKwaa13tUW1GDRVPMgOU4UCchCwECgYEA+qQfrD/m4Smek3vU3sAF/v8wck9f7WjY+dxsloAkCRTSqqXeAgbXlk7iK8t2FHqpBUI/peUwloPOG3Mk6Cts2O4unwyK8wNUWMtOlAn4XNUEytoKvw0pknEWFr2unA78RuLnj0Y/uDeZxmTUzkDEyBObJ0QyfQu7NvVLuu2OWbkCgYEA3MdC7Sq3cHi7TfAC5ZmO2O6s0pJ0W7+vY7IBJxbgsjdoq5YIkvglaSaPRKysdspr69bSmfTNkNDyVcMiNz72IzBSLAx0Fp1UCpUbGVyPaXi5p+OzGf3AdO6T8biVNIUxtERI7adTZnSKAAu8AzcL5/IJNLZf/r5XkN+Fb7vAL/0CgYEAkByiIXY0mC5IAWDoCpO6Xt33yyIcc/MfHrtArGBNV/NjFb99IQkyGDiPDsNTx36nhGCNHCPlhgWPEnVoOR4O3cRFhim+EvBNJSjwq2n4JdhNgx1PpH468vqWysiRhyWOpGt+3QB1TsSZZFtBiL3w52FuimtJ5GBEatsrifVhLfECgYEApAZekLl1w9fOwJ6aaF5npH/eYitwy2FkOttaw+HZWk6UMzaqdBZsJO0C7/ChyTemancVzE/2EatK/7CT0Ruz3nzd79/ot4x3jc0tbvA3lBKfTD59J8hAnh9KRwHtyDFUtistS3NPIQVgKZyOOI1DCTXm5QTB2Q8tG3MVPeftZzkCgYBPoYlcilHDfBPhdH1WOMQcGCoTmXNGzLxifnbn2Am+rwM5oG8cCeGb9mrs3TlmgLOHhL5BNMkuhblkSzYX3PGYG8J+Txm4zb32y+gGNKv4lVDBUFRfQ3a1c0bgnIqt1dEVRcEEDqzlaooZ5P5qberPhT8L/NJyHea3WTPyjYFo7Q==";
+
+			byte[] signedData = signData2(dataBytes, certificate, sslKey);
+
+			signature = Base64.getEncoder().encodeToString(signedData).replace("\r\n", "");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			//ApplicationLogger.getInstance().info("========== exception in  getDigitalSignature Main  ============ " , e);
+		}
+		return signature;
+	}
+
+	private byte[] signData2(byte[] dataBytes, X509Certificate certificate, String sslKey) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}
